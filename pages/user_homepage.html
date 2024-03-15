@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页</title>
+
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <META HTTP-EQUIV="expires" CONTENT="0">
+
+    <!-- <script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"> -->
+
+    <script src='https://www.haishi.cool/library/jquery-3.6.0.js'></script>
+
+<link href="https://www.haishi.cool/library/bootstrap.min.css" rel="stylesheet">
+<script src="https://www.haishi.cool/library/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://www.haishi.cool/css/common.css">
+
+    <script src='https://www.haishi.cool/js/global.js'></script>
+    <script src='https://www.haishi.cool/js/common.js'></script>
+    <script src='https://www.haishi.cool/js/function.js?2'></script>
+
+</head>
+
+<body>
+
+    <style>
+        .title {
+            font-size: 30px;
+            font-weight: bold;
+        }
+        .error{
+            color: red;
+        }
+    </style>
+
+    <div id="header"></div>
+
+    <div class="container section_container">
+        <div class="title"><span id="user_name"></span>的个人主页</div>
+        <!-- <a id="post_history" href="#">发帖历史</a> -->
+
+        <p>
+            <!-- UID:<span id="user_id"></span> -->
+            <!-- 用户名:<span id="login_name"></span> -->
+            <!--注册时间: <span id="user_time"></span> -->
+        </p>
+
+
+        <div id="1">
+            <button class="btn btn-md btn-outline-primary" id="change_info" style="display:none">修改资料</button>
+            <button class="btn btn-md btn-outline-primary" id="message" style="display:none">与TA私信</button>
+        </div>
+        <br>
+
+
+        <div id="info">
+            <p>昵称: <span id="user_name2"></span></p>
+            <p>签名: <span id="user_show"></span></p>
+            <p>性别: <span id="user_sex"></span></p>
+            <!-- <p>电话:<span id="user_phone"></span></p>
+            <p>邮箱:<span id="user_email"></span></p> -->
+            <p>入学时间: <span id="user_inroll_time"></span></p>
+            <p>学校: <span id="user_university"></span></p>
+            <p>学院: <span id="user_collage"></span></p>
+            <p>专业: <span id="user_major"></span></p>
+        </div>
+
+        <div id="form" style="display:none">
+            <form>
+                <p>
+                    昵称: <input type="text" name="user_name">
+                    <span class="error user_name"></span>
+                </p>
+                <p>签名: <input type="text" name="user_show"></p>
+                <p>性别: <select name="user_sex">
+                        <option value="m">男</option>
+                        <option value="f">女</option>
+                    </select></p>
+                <!-- <p>电话: <input type="text" name="user_phone"></p>
+                <p>邮箱: <input type="text" name="user_email"></p> -->
+                <p>入学时间: <input type="text" name="user_inroll_time"></p>
+                <p>学院: <input type="text" name="user_collage"></p>
+                <p>专业: <input type="text" name="user_major"></p>
+                <p><input class="btn btn-sm btn-outline-dark" type="submit" value="提交修改"></p>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        //定义表单展示的状态量
+        var formDisplay = false;
+        var url_userid = getParams(0);
+    </script>
+
+    <script>
+        function show_form() {
+            if (formDisplay) {
+                $('#info').show();
+                $('#form').hide();
+            }
+            else {
+                $('#info').hide();
+                $('#form').show();
+            }
+            formDisplay = !formDisplay;
+        }
+
+        function initial_button() {
+            if (islogin == 1 && userinfo['UID'] == url_userid) {
+                $("#change_info").show();
+            }
+            else {
+                $("#message").show();
+            }
+
+
+            $("#change_info").click(function () {
+                show_form();
+            })
+            $("#message").click(function () {
+                $.get(rooturl+'/php/api/user/add_new_contact.php',{
+                    id:url_userid
+                },function(){
+                    window.location.href = `${rooturl}/message/whisper/${url_userid}`;
+                });
+            });
+        }
+
+        function load_userinfo(data) {
+
+            $("#user_name").text(data['name']);
+            $("#post_history").attr({
+                href: `${rooturl}/record/${data["id"]}`
+            });
+            $("#user_id").text(data['id']);
+            $("#login_name").text(data['login_name']);
+            $("#user_time").text(data['time_creat']);
+
+            $("#user_name2").text(data['name']);
+            $("#user_show").text(data['show']);
+
+            let gender={
+                'm':'男',
+                'f':'女'
+            }
+
+            $("#user_sex").text(gender[data['sex']]);
+            $("#user_phone").text(data['phone']);
+            $("#user_email").text(data['email']);
+            $("#user_inroll_time").text(data['inroll']);
+            $("#user_university").text(find_university_name(data['university']));
+            $("#user_collage").text(data['collage']);
+            $("#user_major").text(data['major']);
+            console.log(data['collage']);
+        }
+
+        function initial_form(data) {
+            $("input[name='user_name']").val(data['name']);
+            $("input[name='user_show']").val(data['show']);
+
+            if(data['sex']){
+            $(`option[value=${data['sex']}]`).attr({ selected: true });
+            }
+            $("input[name='user_phone']").val(data['phone']);
+            $("input[name='user_email']").val(data['email']);
+            $("input[name='user_inroll_time']").val(data['inroll']);
+            $("input[name='user_collage']").val(data['collage']);
+            $("input[name='user_major']").val(data['major']);
+
+            $('form').submit(function (event) {
+                event.preventDefault();
+                let f = $('form')[0];
+                let data = new FormData(f);
+
+                (function upload_form() {
+                    if(data.get('user_name').trim()==''){
+                        $('.error.user_name').text('昵称不能为空');
+                        return;
+                    }
+                    $.get(rooturl + "/php/api/user/change_info.php", {
+                        user_name: data.get('user_name'),
+                        user_show: data.get('user_show'),
+                        user_sex: data.get('user_sex'),
+                        user_phone: data.get('user_phone'),
+                        user_email: data.get('user_email'),
+                        user_inroll_time: data.get('user_inroll_time'),
+                        user_collage:data.get('user_collage'),
+                        user_major:data.get('user_major')
+                    }, function () {
+                        $("#user_name2").text(data.get('user_name'));
+                        $("#user_show").text(data.get('user_show'));
+                        let gender={
+                            'm':'男',
+                            'f':'女'
+                        }
+
+                        $("#user_sex").text(gender[data.get('user_sex')]);
+                        $("#user_phone").text(data.get('user_phone'));
+                        $("#user_email").text(data.get('user_email'));
+                        $("#user_inroll_time").text(data.get('user_inroll_time'));
+                        $("#user_collage").text(data.get('user_collage'));
+                        $("#user_major").text(data.get('user_major'));
+
+                        
+                        show_form();
+                        location.reload();
+                    })
+
+                })();
+
+            });
+
+        }
+
+    </script>
+
+    <script>
+        function reload_userinfo_data() {
+            $.get(rooturl + '/php/api/user/get_userinfo.php', {
+                id: url_userid
+            }, function (result) {
+                console.log(result);
+                let data = JSON.parse(result);
+                load_userinfo(data);
+                initial_button();
+                initial_form(data);
+            });
+        }
+
+    </script>
+
+    <script>
+        $('#header').load(rooturl + '/components/header.html');
+        $('#footer').load(rooturl + '/components/footer.html');
+
+        reload_userinfo_data();
+
+        console.log(find_university_name('10254'));
+    </script>
+
+    <!--鼠标点击爆炸五颜六色特效-->
+    <canvas class="fireworks" style="position:fixed;left:0;top:0;z-index:99999999;pointer-events:none;">
+    </canvas>
+    <script type="text/javascript" src="/js/effects/click_fireworks/anime.min.js"></script>
+    <script type="text/javascript" src="/js/effects/click_fireworks/fireworks.js"></script>
+    <!--end-->
+
+
+
+
+</body>
+
+</html>

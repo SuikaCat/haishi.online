@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小海狮校内问答</title>
+    <meta name="description" itemprop="description" content="小海狮主页" />
+
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <META HTTP-EQUIV="expires" CONTENT="0">
+
+    <script src='https://www.haishi.cool/library/jquery-3.6.0.js'></script>
+    <script src="https://www.haishi.cool/library/jquery.cookie.min.js"></script>
+
+    <link href="https://www.haishi.cool/library/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.haishi.cool/library/bootstrap.min.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="https://www.haishi.cool/css/common.css?4">
+
+    <script src='https://www.haishi.cool/js/global.js'></script>
+    <script src='https://www.haishi.cool/js/common.js'></script>
+    <script src='https://www.haishi.cool/js/function.js?4'></script>
+
+</head>
+
+<body>
+
+    <style>
+        .title {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .form_template {
+            /*border: 1px solid #111;*/
+            margin: 20px;
+            padding: 15px 20px;
+        }
+
+        #form_title {
+            padding: 0px 15px;
+            height: 30px;
+            width: 400px;
+            font-size: 15px;
+
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        #form_type {
+            padding: 0px 5px;
+            height: 25px;
+            width: 70px;
+            font-size: 10px;
+
+            text-align: center;
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        #form_content {
+            padding: 10px 15px;
+            height: 300px;
+            width: 800px;
+            font-size: 15px;
+
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            resize: none;
+        }
+
+
+
+        .art {
+            margin: 20px;
+            padding: 15px 10px;
+            box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+
+        .art_title {
+
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .art_content {
+
+            /* 限制内容行数 */
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            padding: 3px 10px;
+            font-size: 15px;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        #page_num {
+            height: 30px;
+        }
+
+        .page_num_button {
+            margin: 0px 5px;
+
+            display: inline-block;
+            float: left;
+
+            width: 20px;
+            height: 20px;
+
+            text-align: center;
+            box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .link_nav {
+            height: 50px;
+            background-color: whitesmoke;
+        }
+
+        .link_nav>ul {
+            list-style: none;
+        }
+
+        .link_block {
+            margin: 0 10px;
+        }
+
+        .link_block>a {
+            padding: 5px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 500;
+            color: black;
+        }
+
+        .link_block>a:hover,
+        .link_block>a.active {
+            background-color: lightgray;
+            color: black;
+        }
+
+        .newArtSymbol {
+            color: green;
+            font-family: 'Helvetica', Courier, monospace;
+            font-size: 10px;
+            margin-right: 3px;
+        }
+        .prioritizedArtSymbol {
+            color: red;
+            font-family: 'Helvetica', Courier, monospace;
+            font-size: 10px;
+            margin-right: 3px;
+        }
+
+
+        @media screen and (max-width:576px) {
+            .navi2 {
+                height: auto;
+            }
+        }
+    </style>
+    <div class="wrapper">
+
+        <div id="header"></div>
+
+        <div class="container-fluid link_nav d-flex align-items-center navi2 ">
+            <div class="d-flex align-items-center">
+
+                <div class="link_block">
+                    <a id="生活区" class="nav-link" href="https://www.haishi.cool/smu/list/2/0">生活</a>
+                </div>
+                <div class="link_block">
+                    <a id="学习区" class="nav-link" href="https://www.haishi.cool/smu/list/3/0">学习</a>
+                </div>
+                <div class="link_block">
+                    <a id="考研区" class="nav-link" href="https://www.haishi.cool/smu/list/1/0">考研</a>
+                </div>
+                <div class="link_block">
+                    <a id="推免区" class="nav-link" href="https://www.haishi.cool/smu/list/4/0">推免</a>
+                </div>
+                <div class="link_block">
+                    <a id="留学区" class="nav-link" href="https://www.haishi.cool/smu/list/5/0">留学</a>
+                </div>
+                <div class="link_block">
+                    <a id="就业区" class="nav-link" href="https://www.haishi.cool/smu/list/6/0">就业</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container section_container">
+            <p id="art_list_title" class="title">标题</p>
+            <div id="art_list"></div>
+
+            <div id="page_num"></div>
+        </div>
+
+        <div id="footer"></div>
+    </div>
+    <!--帖子模板-->
+    <div id="art_template" class="art" style="display:none">
+        <div class="row d-flex align-items-baseline">
+            <div class="art_main col-8">
+                <div class="d-flex align-baseline">
+                    <div class="prioritizedArtSymbol"></div>
+                    <div class="newArtSymbol"></div>
+                    <div class="art_title title_content"></div>
+                </div>
+                <div class="art_content">
+                </div>
+            </div>
+            <div class="author_info col-4">
+                <div>
+                    <div class="art_info_comment d-inline"></div>
+                    <div class="art_info_update d-inline" style="color: red;"></div>
+                </div>
+
+
+                <!-- <div class="author_info_name"><a>作者</a></div> -->
+                <div class="author_info_time" style="font-size: 12px;">时间</div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script>
+        var url_type = getParams(1);
+        var url_start = getParams(0);
+    </script>
+
+    <script>
+        //判断输入内容
+        function check() {
+            var bool = true;
+
+            if ($('form').find('[name="title"]').val() == '') {
+                $("#title_error").text('请输入标题');
+                bool = false;
+            }
+
+            if ($('form').find('[name="content"]').val() == '') {
+                $("#content_error").text('请输入内容');
+                bool = false;
+            }
+
+            return bool;
+        }
+
+        //加载区块标题
+        function load_area_title(type) {
+            let type_name = {
+                '0': '所有帖子',
+                '1': '考研区',
+                '2': '生活区',
+                '3': '学习区',
+                '4': '推免区',
+                '5': '留学区',
+                '6': '就业区'
+            };
+
+            $('#art_list_title').text(type_name[type]);
+        }
+
+
+
+        //加载文章信息
+        function load_art(data) {
+            //生产一个文章板块
+            function produce_art(art_info) {
+                var $block = $('#art_template').clone().css({
+                    display: 'block'
+                }).removeAttr('id');
+
+                art_info['update'] == 1 && art_info['number_comment'] != '0' ? $block.find('.art_info_update').text('🔥') : 0;
+                art_info['isNew'] == 1 ? $block.find('.newArtSymbol').text('[new!]') : 0;
+                art_info['state_priority'] > 0 ? $block.find('.prioritizedArtSymbol').text('[置顶]') : 0;
+
+
+                $block.find('.art_info_like').text('点赞:' + art_info['number_like']);
+                $block.find('.art_info_comment').text(`回复: ${art_info['number_comment']}`);
+                $block.find('.title_content').text(art_info['title']);
+                $block.find('.art_content').text(HtmlToText(art_info['content']));
+                $block.find('a').attr({
+                    href: '#' + art_info['author']
+                });
+                $block.find('a').text(art_info['author_name']);
+                $block.find('.author_info_time').text(art_info['time_creat'].substring(5, 16));
+
+                $block.click(function () {
+                    location.href = `${rooturl}/smu/article/${art_info['id']}/0`;
+                })
+
+                return $block;
+            }
+
+            for (var i = 0; data[i]; i++) {
+                $("#art_list").append(produce_art(data[i]));
+            }
+        }
+
+        //加载分页
+        function load_page_num(page_num) {
+            for (let i = 0; i < page_num; i++) {
+
+                var $block = $('<div></div>').addClass('page_num_button');
+                $block.text(i + 1);
+                $block.click(function () {
+                    location.href = `${rooturl}/smu/list/${url_type}/${i * 10}`;
+                });
+                $block.appendTo('#page_num');
+            }
+
+        }
+    </script>
+
+    <script>
+        //重载文章列表数据
+        function reload_artdata() {
+            $("#art_list").html('');
+            $('#page_num').html('');
+
+            $.get(rooturl + '/php/api/article/get_article_by_type.php', {
+                type: url_type,
+                start: url_start
+            }, function (result) {
+                var data = JSON.parse(result);
+                load_art(data[0]);
+                load_page_num(data[1]);
+            });
+        }
+
+        //加载页面标题
+        function load_html_title(type) {
+            let html_title = {
+                '0': '校园论坛',
+                '1': '考研区',
+                '2': '生活区',
+                '3': '学习区',
+                '4': '推免区',
+                '5': '留学区',
+                '6': '就业区'
+            };
+
+            $('title').text(`小海狮${html_title[type]}`);
+        }
+        function load_nav_active(type) {
+            let strategy = {
+                '0': () => { },
+                '1': () => { $('#考研区').addClass('active') },
+                '2': () => { $('#生活区').addClass('active') },
+                '3': () => { $('#学习区').addClass('active') },
+                '4': () => { $('#推免区').addClass('active') },
+                '5': () => { $('#留学区').addClass('active') },
+                '6': () => { $('#就业区').addClass('active') }
+            };
+            strategy[type]();
+        }
+
+        //页面初始化
+        function initial_page() {
+            load_html_title(url_type);
+        }
+
+    </script>
+
+    <script>
+        $('#header').load(rooturl + '/components/header.html');
+        $('#footer').load(rooturl + '/components/footer.html');
+
+        initial_page();
+        load_area_title(url_type);
+        load_nav_active(url_type);
+        reload_artdata();
+
+    </script>
+
+
+</body>
+
+</html>

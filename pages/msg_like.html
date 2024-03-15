@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <META HTTP-EQUIV="expires" CONTENT="0">
+
+    <title>我的消息</title>
+
+    <script src='https://www.haishi.cool/library/jquery-3.6.0.js'></script>
+
+<link href="https://www.haishi.cool/library/bootstrap.min.css" rel="stylesheet">
+<script src="https://www.haishi.cool/library/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://www.haishi.cool/css/common.css?6">
+
+    <script src='https://www.haishi.cool/js/global.js'></script>
+    <script src='https://www.haishi.cool/js/common.js'></script>
+    <script src='https://www.haishi.cool/js/function.js?18'></script>
+
+    <style>
+        .temple_like{
+        border-bottom: 1px solid;
+        margin: 5px 10px;
+    }
+
+    .temple_like:last-child{
+        border-bottom: none;
+    }
+        .like_info_type{
+            font-weight: bold;
+        }
+        .invalidUser{
+            text-decoration : none;
+            color: black;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <section class="container section_container">
+        <div id="msg_like">
+        </div>
+    </section>
+
+
+
+
+    <!-- 一个点赞消息的模板 -->
+    <div id="temple_like" class="temple_like" style="display: none;">
+        <p class="like_info">
+            <a class="like_info_username">某人</a>
+            赞了你的
+            <span class="like_info_type">类型</span>
+            <a class="like_info_content">内容</a>
+        </p>
+        <p class="like_time">时间</p>
+    </div>
+
+    <script>
+
+        function load_like_area(data) {
+            function produce_like_block(likeinfo) {
+                var $block = $('#temple_like').clone().removeAttr('id').removeAttr('style');
+
+                $block.find('.like_time').text(likeinfo['time_creat']);
+
+
+                $block.find('.like_info_username').text(likeinfo['user']=='0'?'游客':likeinfo['user_name']);
+                likeinfo['user']=='0'?$block.find('.like_info_username').addClass('invalidUser'):$block.find('.like_info_username').attr({ href: `${rooturl}/user/${likeinfo['user']}` });
+                $block.find('.like_info_type').text(likeinfo['type'] == 'art' ? '帖子' : '回帖');
+                $block.find('.like_info_content').text(lengthLimit(HtmlToText(likeinfo['object_content']),15));
+                $block.find('.like_info_content').attr({ href: `${rooturl}/smu/article/${likeinfo['artid']}/0` });
+
+                return $block;
+            }
+
+            for (var i = 0; data[i]; i++) {
+                produce_like_block(data[i]).appendTo('#msg_like');
+            }
+        }
+
+    </script>
+
+    <script>
+        function reload_like_area() {
+            $('#msg_like').html('');
+
+            $.get(rooturl + '/php/api/message/get_msg_like.php', function (result) {
+                let data = JSON.parse(result);
+                load_like_area(data);
+            });
+        }
+    </script>
+
+    <script>
+        $('#header').load(rooturl + '/components/header.html');
+
+        reload_like_area();
+    </script>
+
+
+
+</body>
+
+</html>

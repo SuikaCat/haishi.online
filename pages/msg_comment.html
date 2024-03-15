@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <META HTTP-EQUIV="expires" CONTENT="0">
+
+    <title>我的消息</title>
+
+
+
+    <script src='https://www.haishi.cool/library/jquery-3.6.0.js'></script>
+
+    <link href="https://www.haishi.cool/library/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.haishi.cool/library/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://www.haishi.cool/css/common.css?99">
+
+    <script src='https://www.haishi.cool/js/global.js'></script>
+    <script src='https://www.haishi.cool/js/common.js'></script>
+    <script src='https://www.haishi.cool/js/function.js?10'></script>
+
+    <style>
+        .temple_com {
+            border-bottom: 1px solid;
+            margin: 5px 10px;
+        }
+
+        .temple_com:last-child {
+            border-bottom: none;
+        }
+
+        .com_info_type {
+            font-weight: bold;
+        }
+
+        .com_info_content {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        @media screen and (min-width:576px) {
+            .com_time {
+                left: -20%;
+            }
+
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <section class="container section_container">
+        <div id="msg_com"></div>
+    </section>
+
+
+
+    <!-- 一个回复消息的模板 -->
+    <div id="temple_com" class="temple_com" style="display: none;">
+        <p class="com_info">
+            <a class="com_info_username">某人</a>
+            向你的
+            <span class="com_info_type">类型</span>
+            <a class="com_info_object_content">内容</a>
+            发表了回复
+        <p class="com_info_content">内容</p>
+        <div class=" d-flex flex-row-reverse">
+            <p class="com_time my-0 position-relative">时间</p>
+        </div>
+        </p>
+    </div>
+
+    <script>
+
+
+        function load_area_com(data) {
+            function produce_block_com(cominfo) {
+                var $block = $('#temple_com').clone().removeAttr('id').removeAttr('style');
+
+                $block.find('.com_time').text(cominfo['time_creat']);
+                $block.find('.com_info_username').text(cominfo['author_name']);
+                $block.find('.com_info_username').attr({ href: `${rooturl}/user/${cominfo['author']}` });
+                $block.find('.com_info_type').text(cominfo['level'] == '0' ? '帖子' : '回帖');
+                $block.find('.com_info_object_content').text(lengthLimit(HtmlToText(cominfo['object_content']),15));
+                $block.find('.com_info_object_content').attr({ href: `${rooturl}/smu/article/${cominfo['artid']}/0` });
+                $block.find('.com_info_content').html(cominfo['content']);
+
+                return $block;
+            }
+
+            for (var i = 0; data[i]; i++) {
+                produce_block_com(data[i]).appendTo('#msg_com');
+            }
+        }
+    </script>
+
+    <script>
+        function reload_area_com() {
+            $('#msg_com').html('');
+
+            $.get(rooturl + '/php/api/message/get_msg_reply.php', function (result) {
+                let data = JSON.parse(result);
+                load_area_com(data);
+                console.log(data);
+            });
+        }
+    </script>
+
+    <script>
+        $('#header').load(rooturl + '/components/header.html');
+
+        reload_area_com();
+    </script>
+
+</body>
+
+</html>

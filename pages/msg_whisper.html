@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <title>私信</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <META HTTP-EQUIV="expires" CONTENT="0">
+
+    <script src='https://www.haishi.cool/library/jquery-3.6.0.js'></script>
+
+<link href="https://www.haishi.cool/library/bootstrap.min.css" rel="stylesheet">
+<script src="https://www.haishi.cool/library/bootstrap.min.js"></script>
+
+<link href="https://www.haishi.cool/library/material-design-icons/iconfont/material-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://www.haishi.cool/css/common.css">
+
+    <script src='https://www.haishi.cool/js/global.js'></script>
+    <script src='https://www.haishi.cool/js/common.js'></script>
+    <script src='https://www.haishi.cool/js/function.js'></script>
+
+    <style>
+
+        .col-3,.col{
+            padding: 0;
+        }
+
+        .contact {
+            padding: 7px 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .contact_area {
+            overflow: auto;
+        }
+
+        .message_area {
+            height: 420px;
+            overflow: auto;
+        }
+
+        .message_outline_submit {
+            border-top: 1px solid rgba(0, 0, 0, 0.2);
+            height: 149px;
+        }
+
+        .contact_outline {
+            background-color: white;
+            height: 600px;
+        }
+
+        .message_outline {
+            background-color: #E6E8F1;
+            height: 600px;
+        }
+
+        .outline_title {
+            line-height: 30px;
+            height: 30px;
+            width: auto;
+            text-align: center;
+            color: rgba(0, 0, 0, 0.6);
+            background-color: white;
+        }
+
+        .contact_username {
+            font-weight: bold;
+            font-size: 15px;
+            }  
+        @media only screen and (min-width : 576px) {
+            .contact_username {
+            font-weight: bold;
+            font-size: 18px;
+            }  
+        }
+
+
+        .contact_lastmsg {
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 12px;
+        }
+
+        .message {
+            padding: 5px 10px;
+        }
+
+        .message_info {
+            font-size: 14px;
+            clear: both;
+        }
+
+        .message_content {
+            margin: 5px;
+            padding: 6px 10px;
+            width: -webkit-fit-content;
+            max-width: 75%;
+            border-radius: 15px;
+            background-color: white;
+            font-size: 16px;
+        }
+
+        .my_msg .message_info {
+            text-align: right;
+        }
+
+        .my_msg .message_content {
+            background-color: #8AC007;
+            float: right;
+        }
+
+        .message_outline_submit {
+            padding: 10px;
+        }
+
+        .message_outline_submit textarea {
+            width: 100%;
+            border: none;
+            outline-style: none;
+            resize: none;
+            height: 70%;
+            clear: both;
+            font-size: 15px;
+            background-color: #E6E8F0;
+        }
+
+        .message_outline_submit button {
+            float: right;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <div id="header"></div>
+
+
+    <div class="container section_container">
+        <div class="row">
+            <div class="col-3 contact_outline">
+                <div id="contact_outline_title" class="outline_title">最近消息</div>
+                <div id="contact_area" class="contact_area"></div>
+            </div>
+    
+            <div class="col message_outline">
+                <div id="message_outline_title" class="outline_title">联系人昵称</div>
+                <div id="message_area" class="message_area"></div>
+                <div id="send_msg" class="message_outline_submit">
+                    <textarea name="content"></textarea>
+                    <button class="btn btn-sm btn-primary fs-6">发送</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!--联系人模板-->
+    <div id="contact_template" class="contact" style="display:none">
+        <div class=" d-flex align-items-center">
+            <div>
+                <div class="contact_info">
+                    <span class="contact_username">昵称</span>
+                    <span class="contact_unread">未读消息</span>
+                </div>
+                <div class="contact_lastmsg d-none d-sm-block">最近消息</div>
+            </div>
+            <!-- <div><i class="material-icons">Clear</i></div> -->
+        </div>
+    </div>
+
+
+    <!--聊天信息模板-->
+    <div id="message_template" class="message" style="display:none">
+        <div class="message_info">
+            <a class="message_username" href="#">昵称</a>
+            <span class="message_time">时间</span>
+        </div>
+        <div class="message_content">信息内容</div>
+    </div>
+
+
+    <script>
+        var url_contactid = getParams(0);
+    </script>
+
+    <script>
+        function load_contact_area(data) {
+            function produce_contact_block(contact) {
+                var $block = $("#contact_template").clone().css({
+                    'display': 'block'
+                }).removeAttr('id');
+                $block.find('.contact_username').text(contact['contact_name']);
+
+                var str;
+                contact['number_unread'] != 0 && contact['number_unread'] != null ? str = '(' + contact[
+                    'number_unread'] + ')' : str = '';
+                $block.find('.contact_unread').text(str);
+
+                contact['last_message'].length > 9 ? str = contact['last_message'].slice(0, 9) + '...' : str =
+                    contact['last_message'];
+                $block.find('.contact_lastmsg').text(str);
+                $block.click(function () {
+                    window.location.href = `${rooturl}/message/whisper/${contact['contact']}`;
+                });
+                return $block;
+            }
+
+            for (let i = 0; data[i]; i++) {
+                let x = produce_contact_block(data[i]);
+                x.appendTo($('#contact_area'));
+            }
+        }
+
+        function load_message_area(data) {
+            function produce_message_block(message) {
+                var $block = $("#message_template").clone().css({
+                    'display': 'block'
+                }).removeAttr('id').addClass('boder');
+                if (userinfo['UID'] == message['user']) {
+                    $block.addClass('my_msg');
+                } else {
+                    $block.addClass('oppsite_msg');
+                }
+                $block.find('.message_username').text(message['user_name']);
+                $block.find('.message_username').attr({
+                    href: `${rooturl}/user/${message['user']}`
+                });
+                $block.find('.message_time').text(message['time_creat']);
+                $block.find('.message_content').text(message['content']);
+                return $block;
+            }
+
+            for (let i = 0; data[i]; i++) {
+                let x = produce_message_block(data[i]);
+                x.appendTo($('#message_area'));
+            }
+
+        }
+    </script>
+
+    <script>
+        function reload_contact_area() {
+
+            $('#contact_area').html('');
+
+            $.get(rooturl + '/php/api/message/get_contact_list.php', function (result) {
+                var data = JSON.parse(result);
+                load_contact_area(data);
+            })
+        }
+
+        function reload_whisper_area() {
+            $('#message_area').html('');
+
+            $.get(rooturl + '/php/api/message/get_chat.php', {
+                receiver: url_contactid
+            }, function (result) {
+                var data = JSON.parse(result);
+                load_message_area(data);
+            });
+        }
+
+        function upload_whisper() {
+            $.post(rooturl + '/php/api/message/send_message.php?receiver=' + url_contactid, {
+                content: $("#send_msg").find('textarea').val()
+            }, function () {
+                $("#send_msg").find('textarea').val('');
+                reload_whisper_area();
+            });
+        }
+
+        function initial_sendbox() {
+            $("#send_msg").find('button').click(function () {
+                upload_whisper();
+                reload_contact_area();
+            });
+
+            $('#send_msg').find('textarea').keydown(function (event) {
+                if (event.which == 13) {
+                    if (!event.metaKey) {
+                        event.preventDefault();
+                        upload_whisper();
+                        reload_contact_area();
+                    } else {
+                        this.messageTxt += '/n';
+                    }
+                }
+            });
+        }
+    </script>
+
+
+    <script>
+        $('#header').load(rooturl + '/components/header.html');
+
+        reload_contact_area();
+
+        reload_whisper_area();
+
+        initial_sendbox();
+    </script>
+
+
+</body>
+
+</html>

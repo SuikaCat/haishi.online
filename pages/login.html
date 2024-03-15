@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录</title>
+
+
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <META HTTP-EQUIV="expires" CONTENT="0">
+
+    <script src='https://www.haishi.cool/library/jquery-3.6.0.js'></script>
+
+<link href="https://www.haishi.cool/library/bootstrap.min.css" rel="stylesheet">
+<script src="https://www.haishi.cool/library/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://www.haishi.cool/css/common.css">
+
+    <script src='https://www.haishi.cool/js/global.js'></script>
+    <script src='https://www.haishi.cool/js/common.js'></script>
+    <script src='https://www.haishi.cool/js/function.js'></script>
+
+    <style>
+
+        .title {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .form_template {
+            /*border: 1px solid #111;*/
+            margin: 20px;
+            padding: 15px 20px;
+        }
+
+        .input {
+            margin: 20px;
+        }
+        input {
+            max-width: 100%;
+        }
+
+        #username,
+        #password {
+            padding: 0px 15px;
+            height: 30px;
+            width: 400px;
+            font-size: 15px;
+
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        #remember_text {
+            display: inline-block;
+            margin: 0px 5px;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <div id="header"></div>
+
+
+    <div class="container section_container">
+        <div class="title">用户登录</div>
+        <form id="login_info" class="form_template" autocomplete="on">
+            <div class="input">
+                <input id="username" type="text" name="username" placeholder="用户名">
+            </div>
+
+            <div class="input">
+                <input id="password" type="password" name="password" placeholder="密码">
+            </div>
+
+            <div class="input">
+                <input id="remember" type="checkbox" name="remember" value="yes">
+                <p id="remember_text">7天内自动登录</p>
+            </div>
+
+            <div class="input">
+                <input class="btn btn-outline-primary" id="form_submit" type="submit" name="login" value="登录">
+            </div>
+        </form>
+    </div>
+
+
+
+    <script>
+
+        //表单操作
+        function initial_form() {
+            $('#login_info').submit(function (event) {
+                event.preventDefault();
+                let f = $('#login_info')[0];
+                let data = new FormData(f);
+
+                (function upload_userinfo() {
+                    $.post(rooturl + "/php/api/user/login.php", {
+                        username: data.get('username'),
+                        password: data.get('password'),
+                        remember: data.get('remember')
+                    }, function (result) {
+                        var bool = Number(result);
+                        if (bool) { window.location.href = rooturl + '/index.html'; }
+                        else { alert('用户名或密码错误！'); }
+                    });
+                })();
+
+            });
+        }
+
+    </script>
+
+    <script>
+        $('#header').load(rooturl + '/components/header.html');
+
+        initial_form();
+    </script>
+
+</body>
+
+</html>

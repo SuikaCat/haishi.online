@@ -1,0 +1,443 @@
+<!DOCTYPE HTML>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <title>发表帖子</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <META HTTP-EQUIV="expires" CONTENT="0">
+
+    <script src='https://www.haishi.cool/library/jquery-3.6.0.js'></script>
+    <script src="https://www.haishi.cool/library/jquery.cookie.min.js"></script>
+
+    <link href="https://www.haishi.cool/library/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.haishi.cool/library/bootstrap.min.js"></script>
+    <link href="https://www.haishi.cool/library/material-design-icons/iconfont/material-icons.css"
+        rel="stylesheet">
+
+
+   <!-- 编辑器 -->
+   <link href="https://www.haishi.cool/library/editor/style.css" rel="stylesheet">
+   <script src="https://www.haishi.cool/library/editor/index.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://www.haishi.cool/css/common.css">
+
+    <script src='https://www.haishi.cool/js/global.js'></script>
+    <script src='https://www.haishi.cool/js/common.js'></script>
+    <script src='https://www.haishi.cool/js/function.js'></script>
+
+    <style>
+        .error {
+            color: #FF0000;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <style>
+        .title {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .form_template {
+            /*border: 1px solid #111;*/
+            margin: 20px;
+            padding: 15px 20px;
+        }
+
+        #form_title {
+            padding: 0px 15px;
+            height: 30px;
+            width: 400px;
+            font-size: 15px;
+            max-width: 100%;
+
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        #form_type {
+            /* padding: 0px 5px;
+            height: 25px; */
+            width: 100px;
+            font-size: 14px;
+            /* max-width: 100%;
+
+
+
+            text-align: center;
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 10px; */
+        }
+
+        #form_content {
+            padding: 10px 15px;
+            height: 300px;
+            width: 800px;
+            max-width: 100%;
+
+            font-size: 15px;
+
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            resize: none;
+        }
+
+        .tag {
+            margin: 3px;
+        }
+
+        .tag_name {
+            padding: 0 3px;
+            font-size: 12px;
+            font-weight: 400;
+
+        }
+
+        .tag_btn {
+            padding: 0;
+            border: none;
+            background-color: transparent;
+        }
+
+        .tag_btn .material-icons {
+            font-size: 18px;
+            color: white;
+        }
+
+        .area_tag_search .dropdown-menu {
+            width: 210px;
+        }
+    </style>
+
+
+
+
+    <div id="header"></div>
+
+
+    <div class="container section_container">
+        <p class="title">发帖</p>
+        <form class="form_template">
+            <div class="input"   onkeydown="if(event.keyCode==13){return false;}">
+                <input id="form_title" type="text" name="title" placeholder="填写标题">
+                <span id="title_error" class="error"></span>
+                <br><br>
+            </div>
+            <div class="input d-flex align-items-center">
+                <select id="form_type" class=" form-select" name="type">
+                    <option value="0">无分区</option>
+                    
+                    <option value="2">生活区</option>
+                    <option value="3">学习区</option>
+                    <option value="1">考研区</option>
+                    <option value="4">推免区</option>
+                    <option value="5">留学区</option>
+                    <option value="6">就业区</option>
+                </select>
+                <div class="text-muted ms-2">选择一个分区更有可能被看到哦！</div>
+            </div>
+            <br>
+
+            <div class="input"  onkeydown="if(event.keyCode==13){return false;}">
+                <div><span id="tag_area_title"></span><span class=" d-flex align-items-start" id="tag_name_list"></span></div>
+                <div class="area_tag_search" style="width: 300px">
+                    <div class="input-group">
+                        <input id="tag_search_text" type="text" class="form-control" placeholder="搜索标签">
+                        <button id="tag_add_btn" type="button" class="btn btn-primary">新增标签</button>
+                    </div>
+                    <ul id="tag_select_list" class="dropdown-menu"></ul>
+                </div>
+                <br><br>
+            </div>
+
+            <div class="input" >
+                <!-- <textarea id="form_content" name="content" placeholder="文章内容"></textarea> -->
+                <div id="toolbar-container"></div>
+                <div id="editor-container"></div>
+                <span id="content_error" class="error"></span>
+                <br><br>
+            </div>
+            <div class="input">
+                <input class="btn btn-outline-primary" id="form_submit" type="submit" name="submit" value="发表">
+            </div>
+        </form>
+    </div>
+
+    <div id="footer"></div>
+
+    <!-- 下面是模板 -->
+    <div id="tag_template" class="tag badge rounded-pill bg-primary text-white" style="display: none">
+        <div class="d-flex align-items-center">
+            <span class="tag_name"></span>
+            <button class="tag_btn"><i class="material-icons">clear</i></button>
+        </div>
+    </div>
+
+    <script>
+        var arr_tagid = new Array();
+        var arr_tagname = new Array();
+        var timeout_id;
+    </script>
+
+    <script>
+        //判断输入内容
+
+        function initial_form() {
+            $('form').find('[name="title"]').val($.cookie('postart_title'));
+            // $('form').find('[name="content"]').val($.cookie('postart_content'));
+
+            const {
+                createEditor,
+                createToolbar
+            } = window.wangEditor
+
+            const editorConfig = {}
+            editorConfig.placeholder = '请输入内容'
+
+            // 创建编辑器
+            const editor = createEditor({
+                html: $.cookie('postart_content'),
+                selector: '#editor-container',
+                config: editorConfig,
+                mode: 'default' // 或 'simple' 参考下文
+            })
+
+            //配置工具栏
+            const toolbarConfig = {
+                excludeKeys: [
+                    "blockquote",
+                    'fullScreen',
+                    'insertVideo',
+                    'group-image',
+                    'codeBlock',
+                    'todo',
+                    'justifyLeft',
+                    'justifyRight',
+                    'justifyCenter',
+                    'italic',
+                    'through',
+                    'bgColor'
+            ]
+            }
+
+            // 创建工具栏
+            const toolbar = createToolbar({
+                editor,
+                selector: '#toolbar-container',
+                config: toolbarConfig,
+                mode: 'simple' // 或 'simple' 参考下文
+            })
+
+
+
+            $('form').submit(function (event) {
+                event.preventDefault();
+                if(userinfo['userstate']==3){
+                        alert('用户封禁中,无法操作');
+                        return;
+                    }
+                if (!check()) {
+                    return;
+                }
+
+                let f = $('form')[0];
+                let data = new FormData(f);
+
+                if (islogin) {
+                    (function upload_form() {
+                        $.post(rooturl + "/php/api/article/post_artical.php", {
+                            title: data.get('title'),
+                            type: data.get('type'),
+                            content: editor.getHtml(),
+                            tagarr: trans_arr_to_str(arr_tagid)
+                        }, function () {
+                            $.cookie('postart_title', '');
+                            $.cookie('postart_content', '');
+                            window.location.href = `${rooturl}/smu/list/${data.get('type')}/0`;
+                        });
+                    })();
+                } else {
+                    $.cookie('postart_title', data.get('title'), { expires: 1 });
+                    $.cookie('postart_content', editor.getHtml(), { expires: 1 });
+                    alert('内容已保存！请登录后提交！');
+                }
+            });
+
+            function check() {
+            var bool = true;
+
+            if ($('form').find('[name="title"]').val() == '') {
+                $("#title_error").text('请输入标题');
+                bool = false;
+            }
+
+            if (editor.getText()=='') {
+                $("#content_error").text('请输入内容');
+                bool = false;
+            }
+
+            return bool;
+        }
+
+        }
+    </script>
+
+    <script>
+        function is_TagAmount_LessThan15() {
+            arr_tagid.length < 15 ? true : alert('最多添加15个标签');
+            return arr_tagid.length < 15
+        }
+
+        function trans_arr_to_str(arr) {
+            let str = ',';
+            //其实标签不是非要正序
+            // arr.sort(function(a, b){return a - b});
+            arr.forEach(ele => {
+                str += `${ele},`;
+            });
+            return str
+        }
+
+        function load_tag_selection(data) {
+            data.forEach(element => {
+                let $item = $(`<li><a class="dropdown-item">${element.name}</a></li>`);
+                $item.click(() => {
+                    $('#tag_search_text').val('');
+                    $('#tag_select_list').hide();
+
+                    if (!is_TagAmount_LessThan15() || arr_tagid.includes(Number(element.id))) {
+                        return
+                    }
+                    arr_tagid.push(Number(element.id));
+                    arr_tagname.push(element.name);
+
+                    reload_tagname_list();
+                });
+                $item.appendTo($('#tag_select_list'));
+            });
+            $('#tag_select_list').show();
+        }
+
+        function load_tagname_list(data) {
+            data.length==0?$('#tag_area_title').text(''):$('#tag_area_title').text(`已选标签${arr_tagid.length}/15(数量请尽量少于5个):`);
+
+            data.forEach(ele => {
+                function produce_tag(ele) {
+                    let $block = $('#tag_template').clone().removeAttr('id').removeAttr('style');
+                    $block.find('.tag_name').text(ele);
+                    $block.find('.tag_btn').click(() => {
+                        let i = data.indexOf(ele);
+                        arr_tagid.splice(i, 1);
+                        arr_tagname.splice(i, 1);
+                        reload_tagname_list();
+                    });
+                    return $block;
+                }
+
+                produce_tag(ele).appendTo($('#tag_name_list'));
+            });
+        }
+
+        function reload_tag_selection() {
+            $('#tag_select_list').html('');
+            $.get(rooturl + '/php/api/tags/get_tag_search_result.php', {
+                str: $('#tag_search_text').val()
+            }, function (result) {
+                if (result == 'null') {
+                    $('#tag_select_list').hide();
+                    return
+                }
+                let data = JSON.parse(result);
+                load_tag_selection(data);
+            });
+        }
+
+        function reload_tagname_list() {
+            $('#tag_name_list').html('');
+            load_tagname_list(arr_tagname);
+        }
+
+        function upload_new_tag(name) {
+            $.get(rooturl + '/php/api/tags/creat_new_tag.php', {
+                name: name
+            }, (result) => {
+                let data = JSON.parse(result);
+                $('#tag_search_text').val('');
+                $('#tag_select_list').hide();
+
+                if (!is_TagAmount_LessThan15() || arr_tagid.includes(Number(data.id))) {
+                    return
+                }
+                arr_tagid.push(Number(data.id));
+                arr_tagname.push(data.name);
+
+                reload_tagname_list();
+            });
+        }
+
+        function initial_tag_selecter() {
+            // $("#tag_search_text").bind("input propertychange", function () {
+            //     if ($('#tag_search_text').val() == '') {
+            //         $('#tag_select_list').hide();
+            //         return
+            //     }
+
+            //     clearTimeout(timeout_id);
+            //     timeout_id = setTimeout(() => {
+            //         reload_tag_selection();
+            //     }, 700);
+            // });
+
+            $('#tag_add_btn').click(() => {
+                if(islogin==0){
+                    alert('登陆后才能创建新标签');
+                    return ;
+                }
+                if($('#tag_search_text').val().trim()==''){
+                    return;
+                }else{
+                    upload_new_tag($('#tag_search_text').val().trim());
+                }
+            });
+
+            $('#tag_search_text').keydown(function (event) {
+                if (event.which == 13) {
+                    $("#tag_add_btn").click();
+                }
+                if ($('#tag_search_text').val() == '') {
+                    $('#tag_select_list').hide();
+                    return
+                }
+
+                clearTimeout(timeout_id);
+                timeout_id = setTimeout(() => {
+                    reload_tag_selection();
+                }, 700);
+            });
+        }
+
+
+    </script>
+
+    <script>
+        $('#header').load(rooturl + '/components/header.html');
+        $('#footer').load(rooturl + '/components/footer.html');
+        initial_tag_selecter();
+        initial_form();
+    </script>
+
+
+</body>
+
+</html>

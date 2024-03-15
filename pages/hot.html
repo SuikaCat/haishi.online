@@ -2,9 +2,6 @@
 <html lang="zh">
 
 <head>
-
-
-
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,12 +11,9 @@
     <META HTTP-EQUIV="expires" CONTENT="0">
 
     <script src='https://www.haishi.cool/library/jquery-3.6.0.js'></script>
+
     <link href="https://www.haishi.cool/library/bootstrap.min.css" rel="stylesheet">
     <script src="https://www.haishi.cool/library/bootstrap.min.js"></script>
-
-    <!-- <script src='https://code.jquery.com/jquery-3.6.0.js'></script>
-    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.3/js/bootstrap.min.js"></script> -->
 
     <link rel="stylesheet" type="text/css" href="https://www.haishi.cool/css/common.css">
 
@@ -62,12 +56,27 @@
         }
     </style>
 
-
-
 </head>
 
 <body>
 
+    <div id='header'></div>
+
+    <div class="container section_container">
+        <p class="title">所有帖子(热度排序)</p>
+        <div>
+            <div id="hot"></div>
+        </div>
+    </div>
+
+
+    <!--文章模板-->
+    <div id="art_template" class="art_template" style="display:none">
+        <a>
+            <div class='art_title'></div>
+            <div class="art_content"></div>
+        </a>
+    </div>
 
 
 
@@ -103,10 +112,9 @@
     </script>
 
     <script>
+        $('#header').load('../components/header.html');
 
-
-
-        window.location.href='https://www.haishi.cool/smu/list/0/0';
+        reload_area_hot();
 
     </script>
 

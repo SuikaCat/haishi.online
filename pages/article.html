@@ -1,0 +1,873 @@
+<!DOCTYPE HTML>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <title>帖子详情</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <META HTTP-EQUIV="expires" CONTENT="0">
+
+
+    <script src='https://www.haishi.cool/library/jquery-3.6.0.js'></script>
+    <script src="https://www.haishi.cool/library/jquery.cookie.min.js"></script>
+
+    <link href="https://www.haishi.cool/library/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.haishi.cool/library/bootstrap.min.js"></script>
+    <link href="https://www.haishi.cool/library/material-design-icons/iconfont/material-icons.css"
+        rel="stylesheet">
+
+    <!-- 编辑器 -->
+    <link href="https://www.haishi.cool/library/editor/style.css" rel="stylesheet">
+    <script src="https://www.haishi.cool/library/editor/index.min.js"></script>
+<script>
+    // import '@wangeditor/editor/dist/css/style.css';
+    // import { createEditor, createToolbar, IEditorConfig, IDomEditor } from '@wangeditor/editor';
+
+</script>
+
+
+    <link rel="stylesheet" type="text/css" href="https://www.haishi.cool/css/common.css?2">
+
+    <script src='https://www.haishi.cool/js/global.js'></script>
+    <script src='https://www.haishi.cool/js/common.js'></script>
+    <script src='https://www.haishi.cool/js/function.js?1'></script>
+
+    <style>
+        .error {
+            color: #FF0000;
+        }
+        div.comment {
+            margin: 20px;
+            padding: 15px 20px;
+            box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        @media screen and (max-width:576px) {
+            div.comment {
+                margin: 20px 10px;
+                padding: 15px 10px;
+            }
+            .section_container{
+                margin-top: 25px;
+                padding: 10px 10px;
+                box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        div.sub_com_area {
+            display: none;
+            padding: 5px;
+            background-color: #E5E9F1;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        div.sub_comment {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }
+
+        div.sub_comment:last-child {
+            border-bottom: none;
+        }
+
+
+        div.sub_comment_chat {
+            margin: 2px 2px 2px 40px;
+            padding: 0px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        div.sub_comment_chat:last-child {
+            border-bottom: none;
+        }
+
+
+
+        .material-icons {
+            font-size: 15px;
+            margin-right: 3px;
+        }
+
+        .mirrorRotateLevel {
+            font-size: 18px;
+            transform: rotateY(180deg);
+            /* 水平镜像翻转 */
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <style>
+        .art_info {
+            font-size: 15px;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        #page_num {
+            height: 30px;
+        }
+
+        .page_num_button {
+            margin: 0px 5px;
+            display: inline-block;
+
+            width: 20px;
+            height: 20px;
+
+            text-align: center;
+            box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        #comment_content {
+            padding: 10px 15px;
+            height: 300px;
+            width: 800px;
+            max-width: 100%;
+
+            font-size: 15px;
+
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            resize: none;
+        }
+
+        .com_reply_area_text,
+        .sub_com_reply_area_text,
+        .sub_com_chat_reply_area_text {
+            padding: 5px 8px;
+            height: 80px;
+            width: 600px;
+            max-width: 100%;
+
+            font-size: 15px;
+
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            resize: none;
+        }
+
+        .button_like,
+        .button_edit,
+        .button_reply,
+        .button_delete {
+            border: none;
+            background-color: transparent;
+        }
+
+        @media screen and (min-width:576px) {
+            .align_right {
+                left: -20%;
+            }
+        }
+
+        .share_qrcode {
+            left: -30px;
+            top: -200px;
+            background-color: white;
+            /* border: black 1px solid; */
+            box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+        }
+
+        .com_content {
+            margin: 10px 0;
+        }
+
+        .fold {
+            height: 240px;
+            overflow: hidden;
+        }
+    </style>
+
+    <div class="wrapper">
+
+        <div id="header"></div>
+
+
+        <div class="container section_container">
+            <h1><span id="title"></span></h1>
+            <p class="art_info">
+                阅读量:<span id="view"></span>
+                <a id="author_home" href=''>贴主:<span id="author"></span></a>
+                评论数:<span id="com_num"></span>
+                发表时间:<span id="time"></span>
+            </p>
+
+            <div>
+                <div id="tags" class=" d-flex"></div>
+            </div>
+
+
+            <br>
+            <div id="art_content"></div>
+            <br>
+
+            <button class="btn btn-outline-primary" id="like">
+                <div class=" d-flex align-items-center">
+                    <i class="material-icons">thumb_up</i>
+                    <span id="like_num"></span>
+                    <span>点赞</span>
+                </div>
+            </button>
+            <button class="btn btn-outline-primary position-relative" id="share">
+                <div class="share_qrcode position-absolute" style="display: none;">
+                    <div style="color: black;">推荐微信和QQ扫描</div>
+                    <div style="color: black;font-size: small;">扫描后点右上角按钮分享</div>
+
+
+                    <img src="" alt="分享" width="150" height="150">
+                </div>
+                <div class=" d-flex align-items-center">
+                    <i class="material-icons mirrorRotateLevel">reply</i>
+                    <span id="share_num"></span>
+                    <span>分享</span>
+                </div>
+
+            </button>
+            <button class="btn btn-outline-primary" id="delete_article" style="display:none;"><i
+                    class="material-icons">delete</i>删除</button>
+        </div>
+
+        <div class="container section_container">
+
+            <button class="btn btn-outline-dark" id="sort_by_time">按时间顺序</button>
+            <button class="btn btn-outline-dark" id="sort_by_like">按点赞顺序</button>
+
+            <div id="comment"></div>
+
+            <div id="page_num"></div>
+
+        </div>
+
+        <div class="container section_container">
+            <h2>回帖</h2>
+            <br>
+            <div id="toolbar-container"></div>
+            <div id="editor-container"></div>
+            <br>
+            <div class="d-none"><input id="comment_editable" type="checkbox">允许公开编辑</div>
+            <br>
+            
+            <input class="btn btn-outline-primary" id="submit_comment" type="submit" name="submit" value="提交">
+            <span class="error"></span>
+
+        </div>
+
+        <div id="footer"></div>
+    </div>
+    <!--以下是评论卡片和子评论卡片的模板-->
+
+    <!-- 标签模板 -->
+    <div id="tag_template" class="tag me-1 bg-light badge text-dark" style="display: none;">
+        <div class=" d-flex align-items-center">
+            <i class="material-icons">local_offer</i>
+            <span></span>
+        </div>
+    </div>
+
+    <!--帖子板块-->
+    <div id="com_template" class="comment" style="display:none">
+        <div><a href='#' class="com_user_name">发帖用户昵称</a></div>
+        <div class="com_content" style="display: block;">帖子内容</div>
+        <a class="unfold_btn" style="display: none;" href="">展开全文</a>
+        <div class="com_edit_area" style="display:none;">
+            <textarea class="com_edit_area_text" name="content" rows="4" cols="100"></textarea>
+            <button class="com_edit_area_submit">提交</button>
+        </div>
+        <div class=" d-flex flex-row-reverse">
+            <div class="position-relative align_right">
+                <div class="com_time">发帖时间</div>
+                <button class="button_like"><i class="material-icons">thumb_up</i><span
+                        class="com_like_val"></span></button>
+                <button class="button_delete" style="display:none;"><i class="material-icons">delete</i></button>
+                <button class="button_edit" style="display:none;"><i class="material-icons">edit</i></button>
+                <button class="button_reply"><i class="material-icons">chat</i><span></span></button>
+            </div>
+        </div>
+
+
+        <div class="com_reply_area align-items-end" style="display:none;">
+            <textarea class="com_reply_area_text" placeholder="发表一条评论" name="content" rows="4" cols="100"></textarea>
+            <button class="com_reply_area_submit btn btn-outline-primary">提交</button>
+            <span class="error"></span>
+        </div>
+        <div class="sub_com_area"></div>
+    </div>
+
+    <!--回复板块-->
+    <div id="subcom_template" class="sub_comment" style="display:none">
+        <div><a href='#'>昵称</a><span class="sub_com_content">评论内容</span></div>
+        <button class="button_like"><i class="material-icons">thumb_up</i><span
+                class="sub_com_like_val"></span></button>
+        <button class="button_delete" style="display:none"><i class="material-icons">delete</i></button>
+        <button class="button_reply"><i class="material-icons">chat</i></button>
+        <div class="sub_com_reply_area align-items-end" style="display:none;">
+            <textarea class="sub_com_reply_area_text" name="content" rows="4" cols="100"></textarea>
+            <button class="sub_com_reply_area_submit btn btn-outline-primary">提交</button>
+            <span class="error"></span>
+        </div>
+        <div class="sub_com_chat_area"></div>
+    </div>
+
+    <!--子回复板块-->
+    <div id="subcom_chat_template" class="sub_comment_chat" style="display:none">
+        <div><a href='#'>昵称</a>回复<a href='#'>昵称</a>:</div>
+        <div><span class="sub_com_chat_content">评论内容</span></div>
+        <button class="button_like"><i class="material-icons">thumb_up</i><span
+                class="sub_com_chat_like_val"></span></button>
+        <button class="button_delete" style="display:none"><i class="material-icons">delete</i></button>
+        <button class="button_reply"><i class="material-icons">chat</i></button>
+        <div class="sub_com_chat_reply_area align-items-end" style="display:none;">
+            <textarea class="sub_com_chat_reply_area_text" name="content" rows="4" cols="100"></textarea>
+            <button class="sub_com_chat_reply_area_submit btn btn-outline-primary">提交</button>
+            <span class="error"></span>
+        </div>
+    </div>
+
+
+    <script>
+        var url_artid = getParams(1);
+        var url_start = getParams(0);
+        //默认以时间排序
+        var sort_by = 'time';
+    </script>
+
+
+    <script>
+        //这里是一堆函数
+        function check(text) {
+            var bool = true;
+
+            if (text == '') {
+                bool = false;
+            }
+
+            return bool;
+        }
+
+        function delete_obj(t, ID) {
+            var r = confirm("确认删除？");
+            if (r == true) {
+                $.get(rooturl + '/php/api/article/delete.php', {
+                    t: t,
+                    ID: ID,
+                    artID:url_artid
+                }, function () {
+                    if (t == 1) {
+                        window.location.href = `${rooturl}/smu/list/0/0`;
+                    } else {
+                        //重载评论板块
+                        reload_comment();
+                    }
+                });
+            }
+        }
+
+        function like(ID, type, $target) {
+            $.get(rooturl + '/php/api/article/like.php', {
+                id: ID,
+                type: type
+            }, function (result) {
+                // console.log(result);
+                // if (result == 'Already_processed') {
+                //     alert('你已经点过赞了');
+                // } else {
+                    $target.text(result);
+                // }
+
+            })
+        }
+
+        //加载整个评论区域
+        function load_comment_area(data) {
+
+            //生产一个chat板块
+            function produce_subcomment_chat(multi_comment_chat, parentID) {
+
+                var $block = $('#subcom_chat_template').clone().css({
+                    'display': 'block'
+                }).removeAttr('id');
+
+                $block.find('a').eq(0).attr({
+                    href: `${rooturl}/user/` + multi_comment_chat['author']
+                }).text(multi_comment_chat['author_name']);
+                $block.find('a').eq(1).attr({
+                    href: `${rooturl}/user/` + multi_comment_chat['to_uid']
+                }).text(multi_comment_chat['to_uid_name']);
+                $block.find('.sub_com_chat_content').text(multi_comment_chat['content']);
+                $block.find('.sub_com_chat_like_val').text(multi_comment_chat['number_like']);
+
+                $block.find('.button_like').click(function () {
+                    like(multi_comment_chat['id'], 'com', $block.find('.sub_com_chat_like_val'));
+                });
+
+                if (islogin == 1 && userinfo['UID'] == multi_comment_chat['author']) {
+                    $block.find('.button_delete').show();
+                    $block.find('.button_delete').click(function () {
+                        delete_obj(4, multi_comment_chat['id']);
+                    });
+                }
+
+                $block.find('.button_reply').click(function () {
+                    let x = $block.find('.sub_com_chat_reply_area');
+                    x.css('display') == 'none' ? x.addClass('d-flex') : x.removeClass('d-flex');
+                });
+
+                $block.find('.sub_com_chat_reply_area_submit').click(function () {
+                    let x = $block.find('.sub_com_chat_reply_area_text');
+
+                    if (islogin) {
+                        if (userinfo['userstate'] == 3) {
+                            alert('用户封禁中,无法操作');
+                            return;
+                        }
+                        if (!check(x.val())) {
+                            $(this).parent().find('.error').text('请输入内容');
+                            return;
+                        }
+                        upload_comment(url_artid, x.val(), parentID, multi_comment_chat['id'], 3);
+                    } else {
+                        alert('请先登录！');
+                    }
+                });
+
+
+                return $block;
+            }
+
+            //生成一个子评论板块
+            function produce_subcomment(multi_comment) {
+                var $block = $('#subcom_template').clone().css({
+                    'display': 'block'
+                }).removeAttr('id');
+                $block.find('a').attr({
+                    href: `${rooturl}/user/` + multi_comment['author']
+                });
+                $block.find('a').text(multi_comment['author_name']);
+                $block.find('.sub_com_content').text(': ' + multi_comment['content']);
+
+                $block.find('.sub_com_like_val').text(multi_comment['number_like']);
+                $block.find('.button_like').click(function () {
+                    like(multi_comment['id'], 'com', $block.find('.sub_com_like_val'));
+                });
+
+                if (islogin == 1 && userinfo['UID'] == multi_comment['author']) {
+                    $block.find('.button_delete').show();
+                    $block.find('.button_delete').click(function () {
+                        delete_obj(3, multi_comment['id']);
+                    });
+                }
+
+                $block.find('.button_reply').click(function () {
+                    let x = $block.find('.sub_com_reply_area');
+                    x.css('display') == 'none' ? x.addClass('d-flex') : x.removeClass('d-flex');
+                });
+
+                $block.find('.sub_com_reply_area_submit').click(function () {
+                    let x = $block.find('.sub_com_reply_area_text');
+
+                    if (islogin) {
+                        if (userinfo['userstate'] == 3) {
+                            alert('用户封禁中,无法操作');
+                            return;
+                        }
+                        if (!check(x.val())) {
+                            $(this).parent().find('.error').text('请输入内容');
+                            return;
+                        }
+                        upload_comment(url_artid, x.val(), multi_comment['id'], multi_comment['id'], 2);
+                    } else {
+                        alert('请先登录！');
+                    }
+                });
+
+                return $block;
+            }
+
+            //生成一个评论板块
+            function produce_comment(comment) {
+                var $block = $("#com_template").clone().css({
+                    'display': 'block'
+                }).removeAttr('id');
+                $block.find('.com_user_name').attr({
+                    href: `${rooturl}/user/` + comment['author']
+                });
+                $block.find('.com_user_name').text(comment['author_name']);
+                $block.find('.com_content').html(comment['content']);
+
+                $block.find('.unfold_btn').click((evt)=>{
+                    evt.preventDefault();
+
+                    if($block.find('.unfold_btn').text()=='展开全文'){
+                        $block.find('.com_content').removeClass('fold');
+                       $block.find('.unfold_btn').text('收起全文');
+                    }else{
+                        $block.find('.com_content').addClass('fold');
+                       $block.find('.unfold_btn').text('展开全文');
+                    }
+                });
+
+                var lengthLimit;
+                screen.width>900?lengthLimit=450:lengthLimit=150;
+                if(HtmlToText(comment['content']).length>lengthLimit){
+                    $block.find('.com_content').addClass('fold');
+                    $block.find('.unfold_btn').show();
+                }
+
+
+                $block.find('.com_time').text(comment['time_creat']);
+
+                $block.find('.com_edit_area_text').val(comment['content']);
+
+                $block.find('.com_like_val').text(comment['number_like']);
+                $block.find('.button_like').click(function () {
+                    like(comment['id'], 'com', $block.find('.com_like_val'));
+                });
+
+                if (islogin == 1 && userinfo['UID'] == comment['author']) {
+                    $block.find('.button_delete').show();
+                    $block.find('.button_delete').click(function () {
+                        delete_obj(2, comment['id']);
+                    });
+                }
+
+                if (islogin == 1 && comment['state_editable'] == '1') {
+                    $block.find('.button_edit').show();
+                    $block.find('.button_edit').click(function () {
+                        let x = $block.find('.com_edit_area');
+                        let y = $block.find('.com_content');
+                        x.css('display') == 'none' ? x.show() : x.hide();
+                        y.css('display') == 'none' ? y.show() : y.hide();
+                    });
+
+                    $block.find('.com_edit_area_submit').click(function () {
+                        let new_content = $block.find('.com_edit_area_text').val();
+                        upload_edit(comment['id'], new_content);
+                    });
+                }
+
+                $block.find('.button_reply').click(function () {
+                    let x = $block.find('.com_reply_area');
+                    let y = $block.find('.sub_com_area');
+                    x.css('display') == 'none' ? x.addClass('d-flex') : x.removeClass('d-flex');
+
+                    if (y.css('display') == 'none') {
+                        $block.find('.button_reply').find('span').text(`收起回复`);
+                        if ($block.find('.sub_comment').length != 0) {
+                            y.show();
+                        }
+                    } else {
+                        $block.find('.button_reply').find('span').text(`${$block.find('.sub_comment').length + $block.find('.sub_comment_chat').length} 条回复`);
+                        y.hide();
+                    }
+
+
+                });
+
+                $block.find('.com_reply_area_submit').click(function () {
+                    if (islogin) {
+                        let x = $block.find('.com_reply_area_text');
+                        if (userinfo['userstate'] == 3) {
+                            alert('用户封禁中,无法操作');
+                            return;
+                        }
+                        if (!check(x.val())) {
+                            $(this).parent().find('.error').text('请输入内容');
+                            return;
+                        }
+                        upload_comment(url_artid, x.val(), comment['id'], comment['id'], 1);
+                    } else {
+                        alert('请先登录！');
+                    }
+                });
+
+                return $block;
+            }
+
+
+
+            var comment = data[0];
+            var multi_comment = data[1];
+            var multi_comment_chat = data[2];
+
+            for (let i = 0; comment && comment[i]; i++) {
+                var x = produce_comment(comment[i]);
+                if (!multi_comment || !multi_comment[i]) {
+                    //没有评论就关掉评论区
+                    x.find('.sub_com_area').css({
+                        display: 'none'
+                    });
+                }
+
+                for (let t = 0; multi_comment && multi_comment[i] && multi_comment[i][t]; t++) {
+                    var y = produce_subcomment(multi_comment[i][t]);
+
+                    for (let n = 0; multi_comment_chat && multi_comment_chat[i] && multi_comment_chat[i][t] &&
+                        multi_comment_chat[i][t][n]; n++) {
+                        var z = produce_subcomment_chat(multi_comment_chat[i][t][n], multi_comment[i][t]['id']);
+                        z.appendTo(y.find('.sub_com_chat_area'));
+                    }
+
+                    y.appendTo(x.find('.sub_com_area'));
+                }
+
+                x.find('.button_reply').find('span').text(`${x.find('.sub_comment').length + x.find('.sub_comment_chat').length} 条回复`);
+
+                x.appendTo('#comment');
+
+            }
+        }
+
+        //加载文章信息
+        function load_art_area(artinfo) {
+
+            $('#title').text(artinfo['title']);
+            $('#view').text(artinfo['number_view']);
+            $('#author_home').attr({
+                href: `${rooturl}/user/` + artinfo['author']
+            });
+            $('#author').text(artinfo['author_name']);
+            $('#like_num').text(artinfo['number_like']);
+            $('#share_num').text(artinfo['number_share']);
+            $('#com_num').text(artinfo['number_comment']);
+            $('#time').text(artinfo['time_creat']);
+
+            function produce_tag(tag_name) {
+                let $block = $('#tag_template').clone().css({
+                    'display': 'block'
+                }).removeAttr('id');
+                $block.find('span').text(tag_name);
+                return $block
+            }
+
+
+            artinfo['tags'].forEach(ele => {
+                produce_tag(ele).appendTo('#tags');
+            });
+
+
+            if (islogin == 1 && userinfo['UID'] == artinfo['author']) {
+                $('#delete_article').show();
+                $('#delete_article').click(function () {
+                    delete_obj(1, artinfo['id'])
+                });
+            }
+
+            $('#like').click(function () {
+                like(artinfo['id'], 'art', $('#like_num'));
+            });
+
+            function produce_qrcode_source(page_url) {
+                let api = 'https://www.lofter.com/genBitmaxImage?url=';
+                return api + page_url
+            }
+            $('.share_qrcode').find('img').attr('src', produce_qrcode_source(`https://www.haishi.cool/share/?data=smu-article-${url_artid}`));
+
+            $('#share').hover(() => {
+                $('.share_qrcode').css('display') == 'none' ? $('.share_qrcode').show() : $('.share_qrcode').hide();
+            });
+
+
+            $('#art_content').html(artinfo['content']);
+
+
+
+        }
+
+        //加载分页
+        function load_page_num(page_num) {
+
+            for (let i = 0; i < page_num; i++) {
+
+                var $block = $('<div></div>').addClass('page_num_button');
+                $block.text(i + 1);
+                $block.click(function () {
+                    location.href = `${rooturl}/smu/article/${url_artid}/${i * 20}`;
+                });
+                $block.appendTo('#page_num');
+            }
+        }
+
+    </script>
+
+    <script>
+        //这里是获取后端数据
+
+        //阅读量+1
+        $.get(rooturl + '/php/api/article/update_art_view.php', {
+            id: url_artid
+        })
+
+        //获取文章信息
+        function reload_artinfo() {
+            $.get(rooturl + '/php/api/article/get_article_info.php', {
+                id: url_artid
+            }, function (result) {
+                if(result=='deleted'){
+                    location.href=`${rooturl}/404.html`;
+                }
+
+                var artinfo = JSON.parse(result);
+                load_art_area(artinfo);
+                $('title').text(`海狮论坛 - ${artinfo['title']}`);
+            });
+        }
+
+        function reload_comment() {
+            $('#comment').html('');
+            $('#page_num').html('');
+
+            $.get(rooturl + '/php/api/article/comment/get_art_comment.php', {
+                sort: sort_by,
+                id: url_artid,
+                start: url_start
+            }, function (restlt) {
+                var data = JSON.parse(restlt);
+                load_comment_area(data);
+                load_page_num(data[3]);
+            });
+        }
+
+        function upload_comment(p1, p2, p3, p4, p5) {
+            let p6 = 0;
+            p5 == 0 && $('#comment_editable')[0].checked ? p6 = 1 : false;
+
+            $.post(rooturl + '/php/api/article/comment/comment.php', {
+                artid: p1,
+                content: p2,
+                belong: p3,
+                to_object: p4,
+                level: p5,
+                editable: p6
+            }, function () {
+                //评论成功后触发帖子部分获取数据并重载
+                reload_comment();
+            });
+        }
+
+        function upload_edit(comid, new_content) {
+            $.post(rooturl + '/php/api/article/comment/edit_comment.php', {
+                id: comid,
+                content: new_content
+            }, function () {
+                reload_comment();
+            });
+        }
+
+        function initial_sortbtn() {
+
+            $('#sort_by_time').click(function () {
+                sort_by = 'time';
+                reload_comment();
+            });
+            $('#sort_by_like').click(function () {
+                sort_by = 'like';
+                reload_comment();
+            });
+
+        }
+
+        function initial_comment_lv0() {
+            const {
+                createEditor,
+                createToolbar
+            } = window.wangEditor
+
+            const editorConfig = {}
+            editorConfig.placeholder = '请输入内容'
+
+            // 创建编辑器
+            const editor = createEditor({
+                html: $.cookie('comment_content'),
+                selector: '#editor-container',
+                config: editorConfig,
+                mode: 'default' // 或 'simple' 参考下文
+            })
+
+            //配置工具栏
+            const toolbarConfig = {
+                excludeKeys: [
+                    "blockquote",
+                    'fullScreen',
+                    'insertVideo',
+                    'group-image',
+                    'codeBlock',
+                    'todo',
+                    'justifyLeft',
+                    'justifyRight',
+                    'justifyCenter',
+                    'italic',
+                    'through',
+                    'bgColor'
+            ]
+            }
+
+            // 创建工具栏
+            const toolbar = createToolbar({
+                editor,
+                selector: '#toolbar-container',
+                config: toolbarConfig,
+                mode: 'simple' // 或 'simple' 参考下文
+            })
+
+
+
+
+            $('#submit_comment').click(function () {
+                if (islogin) {
+                    if (userinfo['userstate'] == 3) {
+                        alert('用户封禁中,无法操作');
+                        return;
+                    }
+                    if (editor.getText()=='') {
+                        $(this).parent().find('.error').text('请输入内容');
+                        return;
+                    }
+
+                    upload_comment(url_artid, editor.getHtml(), url_artid, url_artid, 0);
+
+                    editor.clear();
+                    $.cookie('comment_content_artid', '');
+                    $.cookie('comment_content', '');
+                } else {
+                    $.cookie('comment_content_artid', url_artid);
+                    $.cookie('comment_content', editor.getHtml());
+                    alert('内容已保存！请登陆后提交！');
+                }
+            });
+
+        }
+
+    </script>
+
+    <script>
+        $('#header').load(rooturl + '/components/header.html');
+        $('#footer').load(rooturl + '/components/footer.html');
+
+
+        reload_artinfo();
+
+        reload_comment();
+
+
+        initial_sortbtn();
+
+        initial_comment_lv0();
+
+        console.log(islogin);
+    </script>
+
+</body>
+
+</html>

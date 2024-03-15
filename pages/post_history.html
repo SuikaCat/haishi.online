@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <META HTTP-EQUIV="expires" CONTENT="0">
+
+    <title>发帖历史</title>
+
+    <script src='https://www.haishi.cool/library/jquery-3.6.0.js'></script>
+
+<link href="https://www.haishi.cool/library/bootstrap.min.css" rel="stylesheet">
+<script src="https://www.haishi.cool/library/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://www.haishi.cool/css/common.css">
+
+    <script src='https://www.haishi.cool/js/global.js'></script>
+    <script src='https://www.haishi.cool/js/common.js'></script>
+    <script src='https://www.haishi.cool/js/function.js'></script>
+    
+</head>
+
+<body>
+
+    <style>
+        .container {
+            margin: 60px 6%;
+            padding: 10px 20px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+            font-family: myFirstFont;
+            background-color: white;
+        }
+
+        .title {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .art {
+            margin: 20px;
+            padding: 15px 20px;
+            box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+
+        .art_info {
+            vertical-align: top;
+            display: inline-block;
+            width: 10%;
+        }
+
+        .art_main {
+            vertical-align: top;
+            display: inline-block;
+            width: 70%;
+        }
+
+        .author_info {
+            vertical-align: top;
+            display: inline-block;
+            margin: 0 0 0 4%;
+            width: 15%;
+        }
+
+        .art_title {
+            display: block;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .art_content {
+            display: block;
+            padding: 3px 10px;
+            font-size: 15px;
+            color: rgba(0, 0, 0, 0.6);
+        }
+    </style>
+
+    <div id="header"></div>
+
+    <div class="container">
+        <p class="title">发帖记录</p>
+        <div id="art_list"></div>
+    </div>
+
+    <!--帖子模板-->
+    <div id="art_template" class="art" style="display:none">
+        <div class="art_info">
+            <div class="art_info_like">点赞数</div>
+            <div class="art_info_comment">回复数</div>
+        </div>
+        <div class="art_main">
+            <aiv class="art_title"></aiv>
+            <aiv class="art_content"></aiv>
+        </div>
+        <div class="author_info">
+            <div class="author_info_name"><a>作者</a></div>
+            <div class="author_info_time">时间</div>
+        </div>
+    </div>
+
+    <script>
+        var url_userid = getParams(0);
+    </script>
+
+    <script>
+        function load_art(data) {
+            function produce_art(art_info) {
+                var $block = $('#art_template').clone().css({ display: 'block' }).removeAttr('id');
+
+                $block.find('.art_info_like').text('点赞:' + art_info['number_like']);
+                $block.find('.art_info_comment').text('回复:' + art_info['number_comment']);
+                $block.find('.art_title').text(art_info['title']);
+                $block.find('.art_content').text(art_info['content']);
+                $block.find('a').attr({ href: '#' + art_info['author'] });
+                $block.find('a').text(art_info['author_name']);
+                $block.find('.author_info_time').text(art_info['time_creat']);
+
+                $block.click(function () {
+                    location.href = `${rooturl}/smu/article/${art_info['id']}/0`;
+                })
+
+                return $block;
+            }
+
+            for (var i = 0; data[i]; i++) {
+                $("#art_list").append(produce_art(data[i]));
+            }
+        }
+    </script>
+
+    <script>
+        function reload_artlist() {
+            $("#art_list").html('');
+
+            $.get(rooturl + '/php/api/user/get_user_art.php', {
+                id: url_userid
+            }, function (result) {
+                var data = JSON.parse(result);
+                load_art(data);
+            });
+        }
+    </script>
+
+    <script>
+        $('#header').load(rooturl + '/components/header.html');
+        reload_artlist();
+    </script>
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,246 @@
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册</title>
+
+
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <META HTTP-EQUIV="expires" CONTENT="0">
+
+    <script src='https://www.haishi.cool/library/jquery-3.6.0.js'></script>
+
+<link href="https://www.haishi.cool/library/bootstrap.min.css" rel="stylesheet">
+<script src="https://www.haishi.cool/library/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://www.haishi.cool/css/common.css">
+
+    <script src='https://www.haishi.cool/js/global.js'></script>
+    <script src='https://www.haishi.cool/js/common.js?1'></script>
+    <script src='https://www.haishi.cool/js/function.js?3'></script>
+
+    <style>
+
+        .title {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .form_template {
+            /*border: 1px solid #111;*/
+            margin: 20px;
+            padding: 15px 20px;
+        }
+
+        .input {
+            margin: 20px;
+        }
+        input {
+            max-width: 100%;
+        }
+
+        #username,
+        #password,
+        #confirm_pass,
+        #email,
+        #collage {
+            padding: 0px 15px;
+            height: 30px;
+            width: 400px;
+            font-size: 15px;
+
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id='header'></div>
+
+    <div class="container section_container">
+
+        <div class="title">注册用户</div>
+
+        <form class="form_template">
+            <div class="input">
+                账号*: <input id="username" type="text" name="name" placeholder="小于16位的数字,字母,下划线">
+                <span id="name_error" class="error"></span>
+            </div>
+            <div class="input">
+                密码*: <input id="password" type="password" name="pass" placeholder="小于16位的数字,字母,下划线">
+                <span id="pass_error" class="error"></span>
+            </div>
+            <div class="input">
+                确认密码*: <input id="confirm_pass" type="password" name="confirm_pass">
+                <span id="confirm_pass_error" class="error"></span>
+            </div>
+            <div class="input">
+                学院: <input id="collage" type="text" name="collage">
+                <span id="collage_error" class="error"></span>
+            </div>
+            <!-- <div class="input">
+                E-mail: <input id="email" type="text" name="email"  placeholder="邮箱将用于重置密码">
+                <span id="email_error" class="error"></span>
+            </div> -->
+            <div class="input">
+                性别:
+                <input type="radio" name="gender" value="female">女
+                <input type="radio" name="gender" value="male">男
+            </div>
+            <!-- <div class="input d-flex align-items-center">
+                <input type="checkbox" name="notation">
+                我同意本站
+                <a class="userAgreement"  href="#">用户协议</a>
+            </div> -->
+            <div class="input">
+                <input class="btn btn-outline-primary" id="form_submit" type="submit" name="submit" value="提交">
+                <p id="alert"></p>
+            </div>
+        </form>
+
+    </div>
+
+    <script>
+        //登录跳转的警告弹窗
+        var t = 3;//设定跳转的时间
+    </script>
+
+    <script>
+        //检测表单并提示错误，无错误时返回true
+        function check() {
+            var checker;
+            var bool = true;
+
+            //用户名不能超过16字，不含特殊符号
+            let text = $('form').find('[name="name"]').val();
+            checker = new Checker(text);
+            if (checker.is_blank()) {
+                //修改信息
+                $("#name_error").text('请输入用户名');
+                bool = false;
+            }
+            else if (checker.text.length > 16) {
+                //修改信息
+                $("#name_error").text('用户名最长16位');
+                bool = false;
+            }
+            else if (!checker.is_notspecil) {
+                //修改信息
+                $("#name_error").text('用户名不能含有特殊字符');
+                bool = false;
+
+            }
+
+            //密码不能超过16字，不含特殊符号
+            text = $('form').find('[name="pass"]').val();
+            checker = new Checker(text);
+            if (checker.is_blank()) {
+                $("#pass_error").text('请输入密码');
+                bool = false;
+            }
+            else if (checker.text.length > 16) {
+                //修改信息
+                $("#pass_error").text('密码最长16位');
+                bool = false;
+            }
+            else if (checker.is_special) {
+                //修改信息
+                $("#pass_error").text('密码只能含有字母和数字');
+                bool = false;
+            }
+
+            //确认密码要和密码一致
+            text = $('form').find('[name="confirm_pass"]').val();
+            if (text != $('form').find('[name="pass"]').val()) {
+                $("#confirm_pass_error").text('两次输入密码不一致');
+                bool = false;
+            }
+
+
+            //邮箱要符合格式
+            // text = $('form').find('[name="email"]').val();
+            // checker = new Checker(text);
+            // if (checker.is_blank()) {
+            //     $("#email_error").text('请输入邮箱');
+            //     bool = false;
+            // }
+            // else if (!checker.is_email()) {
+            //     $("#email_error").text('邮箱格式不正确');
+            //     bool = false;
+            // }
+
+            return bool;
+        }
+
+        function refer() {
+            if (t == 0) {
+                window.location.href = rooturl + "/pages/login.html"; //#设定跳转的链接地址
+            }
+            $('#alert').text('注册成功！ ' + t + "秒后跳转登录");
+            t--;
+        }
+
+        function initial_form() {
+
+            // $('input[name="notation"]').click(()=>{
+                
+            //     if($('input[name="notation"]').is(':checked')){
+            //         $("#form_submit").removeAttr("disabled",'false');
+            //     }else{
+            //         $("#form_submit").attr("disabled",'true');
+            //     }
+            // });
+
+            // $('.userAgreement').click(()=>{
+            //     alert('');
+            // })
+
+            $("form").submit(function (event) {
+                event.preventDefault();
+
+                if (check()) {
+                    let t = $('form')[0];
+                    let data = new FormData(t);
+                    (function upload_form() {
+                        $.post("php/api/user/signup.php", {
+                            name: data.get('name'),
+                            pass: data.get('pass'),
+                            // email: data.get('email'),
+                            gender: data.get('gender'),
+                            collage: data.get('collage')
+                        }, function (result) {
+                            if(result=='success')
+                            {
+                                // setInterval("refer()", 1000); //启动1秒定时,3秒跳转
+                                window.location.href = rooturl + "/pages/login.html"; //#设定跳转的链接地址
+                            }else if(result=='user name has been used'){
+                                alert('该用户名已被注册');
+                            }
+                            
+                        });
+                    })();
+                }
+            });
+        }
+    </script>
+
+    <script>
+        $('#header').load(rooturl + '/components/header.html');
+        initial_form();
+
+        // window.onload=function(){
+        //     alert('1. 本站禁止发布违法信息。\n2. 为保障用户使用体验，本站禁止发布广告。\n3. 您的密码信息经过加密处理，任何人包括开发人员也无法查看。请放心注册~');
+        // }
+
+    </script>
+
+
+</body>
+
+</html>

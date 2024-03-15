@@ -1,0 +1,151 @@
+
+<style>
+    .navbar {
+        padding: 8px 3%;
+        background-color: white;
+        box-shadow: 0px 8px 150px 0px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+    <div class="container-fluid px-5">
+        <a class="navbar-brand d-flex align-items-center" href="https://www.haishi.cool">
+            <img src="https://www.haishi.cool/media/image/haishi_icon/icon_100x75.png" alt="小海狮" width="53px"
+                height="40px">
+            <div class="ps-2">小海狮</div>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-sm-0">
+                <li class="nav-item">
+                    <a id="link_home" class="nav-link px-3 " href="https://www.haishi.cool">主页</a>
+                </li>
+                <li class="nav-item">
+                    <a id="link_post" class="nav-link px-3" href="https://www.haishi.cool/post/topic">发帖</a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a id="link_viewall" class="nav-link px-3" href="https://www.haishi.cool/pages/hot.html">所有帖子</a>
+                </li>
+                <li class="nav-item">
+                    <a id="link_test" class="nav-link px-3" href="https://www.haishi.cool/pages/test.php">测试页</a>
+                </li> -->
+            </ul>
+
+            <div class="d-flex ms-3 me-auto" role="search">
+                <input id="header_search_text" class="form-control me-2" type="search" placeholder="搜索文章标题/标签"
+                    aria-label="Search">
+                <button id="header_search_button" class="btn btn-outline-success" style="width: 70px;"
+                    type="submit">搜索</button>
+            </div>
+
+            <ul class="navbar-nav mb-2 mb-sm-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        账号
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item header_usermenu" id="header_userhomepage" href="#">个人主页</a>
+                        <li><a class="dropdown-item header_usermenu"
+                                href="https://www.haishi.cool/login">切换账号</a></li>
+                        <li><a class="dropdown-item header_usermenu" id="header_logout" href="#">退出登录</a></li>
+                        
+                        
+                        <li><a class="dropdown-item header_loginmenu"
+                                href="https://www.haishi.cool/signup">注册账号</a></li>
+                        <li><a class="dropdown-item header_loginmenu"
+                                href="https://www.haishi.cool/login">登录账号</a></li>
+                    </ul>
+                </li>
+                <li id="header_msg" class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <span id="header_msg_title">消息</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" id="header_msg_like"
+                                href="https://www.haishi.cool/message/like">收到的赞</a></li>
+                        <li><a class="dropdown-item" id="header_msg_com"
+                                href="https://www.haishi.cool/message/comment">回复我的</a></li>
+                        <li><a class="dropdown-item" id="header_msg_wsp"
+                                href="https://www.haishi.cool/message/whisper/none">我的私信</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+<script>
+    function header_initial() {
+        (function load_active() {
+            var str = window.location.href;
+            // str == 'https://www.haishi.cool/' ? $('#link_home').addClass('active') : false;
+            str.search('https://www.haishi.cool/list') != -1 ? $('#link_home').addClass('active') : false;
+            str.search('https://www.haishi.cool/post/topic') != -1 ? $('#link_post').addClass('active') : false;
+            // str.search('https://www.haishi.cool/list') != -1 ? $('#link_viewall').addClass('active') : false;
+            str.search('https://www.haishi.cool/pages/hot.html') != -1 ? $('#link_viewall').addClass('active') : false;
+            str == 'https://www.haishi.cool/pages/test.php' ? $('#link_test').addClass('active') : false;
+        })();
+
+
+        $("#header_search_button").click(function (event) {
+            event.preventDefault();
+            var text = $("#header_search_text").val();
+            location.href = 'https://www.haishi.cool/search/' + text;
+        });
+
+        if (islogin) {
+            
+            $('#header_userhomepage').attr('href', 'https://www.haishi.cool/user/' + userinfo['UID']);
+
+            $('.header_loginmenu').hide();
+        }
+        else {
+            $('.header_usermenu').hide();
+            $('#header_msg').hide();
+
+        }
+
+        $('#header_logout').click(function (event) {
+            event.preventDefault();
+            $.get(rooturl + '/php/api/user/logout.php', function () {
+                window.location.href = 'https://www.haishi.cool';
+            });
+        });
+    }
+
+    function reload_msg_number() {
+        function format_str(n) {
+            return n == 0 ? '' : `(${n})`;
+        }
+
+        if (islogin) {
+            $.get(rooturl + '/php/api/message/get_msg_newnum.php', function (result) {
+                let data = JSON.parse(result);
+
+                let like = Number(data['new_like']);
+                let com = Number(data['new_com']);
+                let wsp = Number(data['new_wsp']);
+
+                $('#header_msg_like').text(`收到的赞${format_str(like)}`);
+                $('#header_msg_com').text(`回复我的${format_str(com)}`);
+                $('#header_msg_wsp').text(`我的私信${format_str(wsp)}`);
+                $('#header_msg_title').text(`消息${format_str(like + com + wsp)}`);
+
+            });
+        }
+
+    }
+</script>
+
+<script>
+    header_initial();
+
+    reload_msg_number();
+</script>
